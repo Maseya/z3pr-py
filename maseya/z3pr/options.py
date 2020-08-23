@@ -234,14 +234,14 @@ def create_options_from_input(
     result = dict()
 
     try_print("Input path to Base ROM")
-    result["input_path"] = cin.readline()
-    if not result["input_path"]:
+    result["input_file"] = cin.readline()
+    if not result["input_file"]:
         raise ValueError("No input was given.")
 
     try_print("Input output path to save ROM (leave empty for same as input path")
-    result["output_path"] = cin.readline()
-    if not result["output_path"]:
-        result["output_path"] = result["input_path"]
+    result["output_file"] = cin.readline()
+    if not result["output_file"]:
+        result["output_file"] = result["input_file"]
 
     def parse_input_int(prompt: str, fallback: int) -> int:
         # Keep trying until we get a result.

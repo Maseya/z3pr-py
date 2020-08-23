@@ -100,8 +100,6 @@ def randomize_from_options(options):
             output_path = os.path.splitext(input_path)[0] + ".json"
         else:
             output_path = append_to_file_name(input_path, "-rand-pal")
-    else:
-        output_path = options.output_path
 
     next_color = _random_color(options.pop("seed", -1))
     with open(input_path, mode="rb") as stream:
