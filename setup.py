@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="maseya-z3pr",
-    version="1.0.0.dev4",
+    version="1.0.0.dev5",
     author="Nelson Garcia",
     author_email="swr.ngarcia@gmail.com",
     description="Randomize palette data for Legend of Zelda: A Link to the Past.",

@@ -1,23 +1,37 @@
+"""Define the SnesColor class."""
+
+
 from .color_f import ColorF
 from .math_helper import clamp
 
 
 class SnesColor:
+    """Represents a super NES 15-bit RGB color."""
+
     def __init__(self, value: int):
         self.__value = value & 0xFFFF
 
     @classmethod
     def from_high_and_low(cls, low: int, high: int):
+        """Construct color from high and low byte values."""
         return cls((low & 0xFF) | ((high & 0xFF) << 8))
 
     @classmethod
     def from_rgb(cls, red: int, green: int, blue: int):
+        """Construct color from 5-bit RGB values."""
         return cls(((red & 0x1F) << 0) | ((green & 0x1F) << 5) | ((blue & 0x1F) << 10))
 
     @classmethod
     def from_color_f(cls, color: ColorF):
+        """Convert a ColorF to a SnesColor."""
+
         def convert_channel(value: float) -> int:
+            """Convert a ColorF color channel to SnesColor color channel."""
+
+            # First we convert the value to an 8-bit component.
             base_value = int((value * 255) + 0.5)
+
+            # We round out the 8-bit component when converting to 5-bit.
             return clamp(base_value + 4, 0, 255) >> 3
 
         return cls.from_rgb(
@@ -36,6 +50,7 @@ class SnesColor:
 
     @property
     def proper_value(self) -> int:
+        """Get the actual RGB snes color value (ignoring the highest bit)."""
         return self.value & 0x7FFF
 
     @proper_value.setter
@@ -93,6 +108,8 @@ class SnesColor:
         return SnesColor(self.__value ^ 0x7FFF)
 
     def to_color_f(self) -> ColorF:
+        """Convert a SnesColor to a ColorF."""
+
         def convert_channel(value: int) -> float:
             # We bitshift right first so that the color conversion aligns with the
             # original C# port. In it, a SnesColor was first converted to an 8 bit per

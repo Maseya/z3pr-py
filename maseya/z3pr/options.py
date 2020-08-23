@@ -332,6 +332,7 @@ def create_options_from_input(
 
 
 def get_options_from_anywhere(args, config_path: str = None) -> dict:
+    """Get options from command line args, or user if no args were given."""
     # If the user passed in no args, it's possible this may represent a system call.
     if not args:
         # So let's verify if this is a system call with no command line parameters.

@@ -1,14 +1,20 @@
+"""Define the maseya_blend function."""
+
+
 from math import sqrt
 
 from .color_f import ColorF
 
 
-def maseya_blend(x: ColorF, y: ColorF) -> ColorF:  # pylint: disable=invalid-name
+def maseya_blend(
+    color: ColorF, changes: ColorF
+) -> ColorF:  # pylint: disable=invalid-name
+    """Change a color value but keep it visually pleasing."""
     # Ensure at least a 2.5% change in hue.
-    hue = (y.red * 0.95) + 0.025 + x.hue
+    hue = (changes.red * 0.95) + 0.025 + color.hue
 
-    chroma_shift = y.green - 0.5
-    x_chroma = x.chroma
+    chroma_shift = changes.green - 0.5
+    x_chroma = color.chroma
     chroma = x_chroma
     if chroma_shift > 0:
         # Put heavy limitations on oversaturating colors.
@@ -19,8 +25,8 @@ def maseya_blend(x: ColorF, y: ColorF) -> ColorF:  # pylint: disable=invalid-nam
         # likely that only a little desaturation will occur.
         chroma *= sqrt(1 - pow(chroma_shift * 2, 2))
 
-    luma_shift = y.blue - 0.5
-    x_luma = x.luma
+    luma_shift = changes.blue - 0.5
+    x_luma = color.luma
     luma = x_luma
     if luma_shift > 0:
         # Do not heavily brighten colors. However, if we removed a lot of

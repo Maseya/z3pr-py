@@ -1,3 +1,5 @@
+"""Define primary palette randomizer functions."""
+
 import json
 import os
 from random import Random
@@ -29,12 +31,13 @@ def build_offsets_array(options: dict):
         return []
 
     offsets = []
+    # TODO(bonimy): Add the other palette data like sprites.
     for name in ["dungeon", "hud", "link_sprite", "sword", "shield", "overworld"]:
         offsets.extend(try_get_offset_array(name))
     return offsets
 
 
-def _random_color(seed: int = -1):
+def _random_color_generator(seed: int = -1):
     """Generate random colors with an optional seed value."""
     random = Random(seed) if seed != -1 else Random()
 
@@ -44,7 +47,9 @@ def _random_color(seed: int = -1):
     return next_color
 
 
-def randomize(rom: bytearray, mode: str, next_color_func, options=dict):
+def randomize(
+    rom: bytearray, mode: str, next_color_func=None, options: dict = None,
+):
     """Randomize palette data in a rom."""
     # We want to do case-invariant searches
     mode = mode.lower()
@@ -52,6 +57,14 @@ def randomize(rom: bytearray, mode: str, next_color_func, options=dict):
     # Skip all calculations if "none" is passed.
     if mode == "none":
         return
+
+    # Create standard random generator if no generator was given.
+    if not next_color_func:
+        next_color_func = _random_color_generator()
+
+    # Randomize just the dungeon and overworld palettes if nothing specified.
+    if not options:
+        options = {"randomize_dungeon": True, "randomize_overworld": True}
 
     # Get the basic algorithms and offer some variant spellings just in case.
     algorithm_tuples = {
@@ -93,19 +106,21 @@ def randomize_from_options(options):
     options = dict(options)
     input_path = options.pop("input_file")
     output_path = options.pop("output_file", "")
-    output_json = options.pop("use_json", False)
 
+    # Infer output path from input path if no output was specified.
     if not output_path:
-        if output_json:
-            output_path = os.path.splitext(input_path)[0] + ".json"
-        else:
-            output_path = append_to_file_name(input_path, "-rand-pal")
+        output_path = append_to_file_name(input_path, "-rand-pal")
 
-    next_color = _random_color(options.pop("seed", -1))
+    # Define color-generating function.
+    next_color = _random_color_generator(options.pop("seed", -1))
+
+    # Read ROM data from file.
     with open(input_path, mode="rb") as stream:
         rom = bytearray(stream.read())
 
+    # Randomize ROM data.
     randomize(rom, options.pop("mode", "default"), next_color, options)
 
+    # Write results to output file.
     with open(output_path, mode="wb") as stream:
         stream.write(rom)

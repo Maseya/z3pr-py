@@ -1,8 +1,11 @@
+"""Define some useful math functions."""
+
 from itertools import chain, combinations
 from typing import Iterable
 
 
 def clamp(value, min_bound, max_bound, less=lambda x, y: x < y):
+    """Clamp a value between an upper and lower bound."""
     if less(value, min_bound):
         return min_bound
     if less(max_bound, value):

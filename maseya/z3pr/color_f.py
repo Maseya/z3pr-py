@@ -1,3 +1,10 @@
+"""
+Define the ColorF class, which represents a color as 3 floats.
+
+These algorithms come from
+https://en.wikipedia.org/wiki/HSL_and_HSV#Color_conversion_formulae
+"""
+
 from typing import Tuple
 from math import fmod
 
@@ -9,6 +16,8 @@ LUMA_BLUE_WEIGHT = 0.114
 
 
 class ColorF:
+    """An RGB color where each RGB component is between [0, 1]."""
+
     def __init__(self, red: float, green: float, blue: float):
         self.__red = red
         self.__green = green
@@ -74,12 +83,14 @@ class ColorF:
 
     @property
     def hue(self):
+        # Technically, NaN should be returned, but returning 0 helps performance.
         if self.chroma == 0:
             return 0
 
         max_rgb = self.max_of_rgb
         if max_rgb == self.__red:
             hue = (self.__green - self.__blue) / self.chroma
+            # Make sure hue is fmodded between 0 and 6.
             if hue < 0:
                 hue += 6
         elif max_rgb == self.__green:
@@ -109,7 +120,10 @@ class ColorF:
         return ColorF(self.cyan, self.magenta, self.yellow)
 
     @staticmethod
-    def get_base_rgb(hue: float, chroma: float) -> Tuple[float, float, float]:
+    def get_base_rgb(  # pylint: disable=too-many-return-statements
+        hue: float, chroma: float
+    ) -> Tuple[float, float, float]:
+        """Get base RGB components, ignoring lightness or luma."""
         if chroma == 0:
             return 0, 0, 0
 
