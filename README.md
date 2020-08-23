@@ -82,7 +82,7 @@ args:
 -J --no-use-json    Output results to ROM file. Default
 
 -w --overworld      Randomize overworld palettes. Default
--W --no-overworld   Do not randomize overworld palettes
+-W --no-overworld   Do not randomize overworld palettes.
 
 -d --dungeon        Randomize dungeon palettes. Default
 -D --no-dungeon     Do not randomize dungeon palettes.
@@ -95,12 +95,6 @@ args:
 
 --shield            Randomize shield palettes.
 --no-shield         Do not randomize shield palettes. Default
-
---sprite            Randomize sprite palettes.
---no-sprite         Do not randomize sprite palettes. Default
-
---sprite2           Randomize advanced sprite palettes.
---no-sprite2        Do not randomize advanced sprite palettes. Default
 
 --hud               Randomize HUD palettes.
 --no-hud            Do not randomize HUD palettes. Default

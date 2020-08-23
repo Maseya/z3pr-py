@@ -1,0 +1,6 @@
+# Do not add ROM files
+*.sfc
+*.smc
+
+# Python exported package folder
+maseya-z3pr-*
