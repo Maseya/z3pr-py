@@ -24,10 +24,16 @@ def _read_internal_json(json_path):
 
 def build_offsets_array(options: dict):
     """Build offset array from several offset arrays."""
+    offset_array_cache = getattr(build_offsets_array, "offset_array_cache", None)
+    if offset_array_cache is None:  # create a new cache on first run
+        offset_array_cache = build_offsets_array.offset_array_cache = {}
 
     def try_get_offset_array(name: str) -> List[int]:
         if options.get(f"randomize_{name}", False):
-            return _read_internal_json(f"{name}.json")
+            cached_offset_array = offset_array_cache.get(name, None)  # try to retrieve cached array
+            if not cached_offset_array:  # build the cache if it's missing
+                cached_offset_array = offset_array_cache[name] = _read_internal_json(f"{name}.json")
+            return cached_offset_array
         return []
 
     offsets = []
