@@ -101,7 +101,7 @@ args:
                     is -1, which specifies not using predetermined
                     seed.
 
---data-dir-value    Read JSON offset files from custom directory.
+--data-dir=value    Read JSON offset files from custom directory.
 
 --mode=value        None: Makes no changes to rom.
 
