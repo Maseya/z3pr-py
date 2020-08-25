@@ -28,7 +28,7 @@ A set of colors is randomized according to the following rules:
 - Shift a color's hue by at least 2.5%. This ensures a color is actually changed.
 - If increasing saturation, do so very gently and proportional to current value.
 - Saturation is okay to be reduced all the way to zero.
-- Increasing brightness is similar to increasing to increasing saturation.
+- Increasing brightness is similar increasing saturation.
 - If a lot of saturation was removed, allow increasing the brightness slightly
   more.
 - If reducing brightness, do so by no more than half (this may be restricted
@@ -68,7 +68,7 @@ you may still experience ugly colors after using this app.
 
 The following command-line arguments are supported by the app:
 
-```bash
+```text
 [args...] inputFile <outputFile>
 
 inputFile           Input path of ROM. Required
@@ -78,9 +78,6 @@ outputFile          Output destination. Optional
                     decide an appropriate file name.
 
 args:
--j --use-json       Output results as JSON file.
--J --no-use-json    Output results to ROM file. Default
-
 -w --overworld      Randomize overworld palettes. Default
 -W --no-overworld   Do not randomize overworld palettes.
 
@@ -104,15 +101,27 @@ args:
                     is -1, which specifies not using predetermined
                     seed.
 
+--data-dir=value    Read JSON offset files from custom directory.
+
 --mode=value        None: Makes no changes to rom.
 
                     Default: Default color mixing algorithm.
+                    Maseya: Same as "Default".
 
                     Negative: Invert all colors.
 
                     Grayscale: Desaturate all colors.
 
                     Blackout: Set all colors to black.
+
+                    Classic: Randomize palette similar to classic web API.
+                        Produces less aesthetic colors if that's your thing.
+
+                    Dizzy: Randomize each color without logic but preserve
+                        saturation and lightness.
+
+                    Sick: Randomize each color without logic but preserve
+                        lightness.
 
                     Puke: Randomize each color without logic.
 ```
@@ -134,7 +143,7 @@ programmer
 
 ## License
 
-C# .NET Console App for randomizing Link to the Past palettes
+Python Console App for randomizing Link to the Past palettes
 Copyright (C) 2018-2020 Nelson Garcia
 
 This program is free software: you can redistribute it and/or modify

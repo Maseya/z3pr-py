@@ -1,6 +1,6 @@
 # Description
 
-Create general editors for 2D tiled games.
+Randomize palettes in Link to the Past multiworld.
 
 ## Philosophy
 

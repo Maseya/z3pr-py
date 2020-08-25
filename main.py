@@ -2,7 +2,7 @@ from maseya import z3pr
 
 
 def main(argv=None):
-    options = z3pr.get_options_from_anywhere(argv, "args.config")
+    options = z3pr.get_options_from_anywhere(argv)
     z3pr.randomize_from_options(options)
 
 

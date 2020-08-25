@@ -29,16 +29,36 @@ class PaletteEditor:
 
     def blend(
         self,
-        blend_func: Callable[[ColorF, ColorF], ColorF],
-        base_color_func: Callable[[], ColorF],
+        blend: Callable[[ColorF, ColorF], ColorF],
+        get_color: Callable[[], ColorF],
     ):
         """Blend palette data using blend function and color generator."""
         # Get base color from passed funcion.
-        base_color = base_color_func()
+        base_color = get_color()
 
         # Blend each color in the palette editor.
         for offset in self.__items.keys():
-            self.__items[offset] = blend_func(self.__items[offset], base_color)
+            self.__items[offset] = blend(self.__items[offset], base_color)
+
+    def get_color_groups(self):
+        result = dict()
+        for offset, color in self.__items.items():
+            colors = result.get(color, None)
+            if not colors:
+                result[color] = [offset]
+            else:
+                colors.append(offset)
+        return result
+
+    def blend_by_color(
+        self,
+        blend: Callable[[ColorF, ColorF], ColorF],
+        get_color: Callable[[], ColorF],
+    ):
+        for color, offsets in self.get_color_groups().items():
+            new_color = blend(color, get_color())
+            for offset in offsets:
+                self.__items[offset] = new_color
 
     def write_to_rom(self, rom: bytearray):
         """Write palette data to rom."""

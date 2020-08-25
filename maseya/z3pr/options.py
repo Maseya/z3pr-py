@@ -16,8 +16,6 @@ FALLBACK_CONFIG = [
     "--no-sword",
     "--no-shield",
     "--mode=default",
-    "--no-sprite",
-    "--no-sprite2",
     "--no-hud",
     "--seed=-1",
 ]
@@ -31,11 +29,14 @@ NEGATIVE_REGEX = re.compile(r"inver(?:t|ted:se)|neg(?:ative)?", re.I)
 DEFAULT_MODES = [
     "None",
     "Default",
-    "Puke",
     "Negative",
     "Grayscale",
     "Blackout",
     "Maseya",
+    "Classic",
+    "Dizzy",
+    "Sick",
+    "Puke",
 ]
 
 
@@ -59,19 +60,11 @@ def get_options(args=None) -> dict:
         epilog="2020 Nelson Garcia",
     )
     parser.add_argument(
-        "-j",
-        "--use-json",
-        action="store_true",
-        dest="use_json",
-        default=False,
-        help="Output results as JSON file.",
-    )
-    parser.add_argument(
-        "-J",
-        "--no-use-json",
-        action="store_false",
-        dest="use_json",
-        help="Output results to ROM file. Default",
+        "--data-dir",
+        dest="data_dir",
+        type=str,
+        default=None,
+        help="Read JSON offset files from custom directory.",
     )
     parser.add_argument(
         "-w",
@@ -181,12 +174,21 @@ seed.
 None: Makes no changes to rom.
 
 Default: Default color mixing algorithm.
+Maseya: Same as "Default".
 
 Negative: Invert all colors.
 
 Grayscale: Desaturate all colors.
 
 Blackout: Set all colors to black.
+
+Classic: Randomize palette similar to classic web API. Produces less aesthetic
+    colors if that's your thing.
+
+Dizzy: Randomize each color without logic but preserve saturation and
+    lightness.
+
+Sick: Randomize each color without logic but preserve lightness.
 
 Puke: Randomize each color without logic.
             """
@@ -196,30 +198,6 @@ Puke: Randomize each color without logic.
     parser.add_argument("output_file", type=str, default="", nargs="?")
 
     return vars(parser.parse_args(args))
-
-
-def get_options_from_file(fname: str) -> dict:
-    with open(fname) as stream:
-        return get_options(stream.readlines())
-
-
-def find_default_options(fname: str) -> dict:
-    """Get file from options or revert to fallback if no file exists."""
-    if os.path.exists(fname):
-        return get_options_from_file(fname)
-    with open(fname, "w") as stream:
-        stream.writelines(FALLBACK_CONFIG)
-
-    # We append a dummy file name so the option parser doesn't fail.
-    args = list(FALLBACK_CONFIG)
-    args.append("dumy_input_file")
-    result = get_options(args)
-
-    # We don't actually want the dummy file info, so let's remove them.
-    result.pop("input_file")
-    result.pop("output_file")
-
-    return result
 
 
 def create_options_from_input(
@@ -328,10 +306,13 @@ def create_options_from_input(
         "default",
     )
 
+    try_print("Enter custom directory to offset files (leave blank to use defaults):")
+    result["data_dir"] = cin.readline()[:-1]
+
     return result
 
 
-def get_options_from_anywhere(args, config_path: str = None) -> dict:
+def get_options_from_anywhere(args) -> dict:
     """Get options from command line args, or user if no args were given."""
     # If the user passed in no args, it's possible this may represent a system call.
     if not args:
@@ -340,9 +321,4 @@ def get_options_from_anywhere(args, config_path: str = None) -> dict:
             # If it is, then let's get the options from the user.
             return create_options_from_input()
 
-    # Let's see if there are any default options we should load.
-    result = find_default_options(config_path) if config_path else dict()
-
-    # Finally, we get the
-    result.update(get_options(args))
-    return result
+    return get_options(args)

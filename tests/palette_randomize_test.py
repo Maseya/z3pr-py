@@ -188,7 +188,10 @@ def test_maseya_blend():
             """Generate colors from our JSON test data."""
             nonlocal next_color_index
             nonlocal random_values
-            result = random_values[next_color_index]
+            try:
+                result = random_values[next_color_index]
+            except:
+                assert False
             next_color_index += 1
             return result
 

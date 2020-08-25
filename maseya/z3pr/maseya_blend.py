@@ -6,9 +6,7 @@ from math import sqrt
 from .color_f import ColorF
 
 
-def maseya_blend(
-    color: ColorF, changes: ColorF
-) -> ColorF:  # pylint: disable=invalid-name
+def maseya_blend(color: ColorF, changes: ColorF) -> ColorF:
     """Change a color value but keep it visually pleasing."""
     # Ensure at least a 2.5% change in hue.
     hue = (changes.red * 0.95) + 0.025 + color.hue
@@ -39,3 +37,22 @@ def maseya_blend(
         luma *= 1 + (luma_shift / 2)
 
     return ColorF.from_hcy(hue, chroma, luma)
+
+
+def acid_blend(base_color: ColorF, new_color: ColorF) -> ColorF:
+    """Change a color value but allow it to occassionally look ugly."""
+
+    def constrict_color_channel(value: float):
+        return (value * (240.0 - 60.0) / 255.0) + (60.0 / 255.0)
+
+    new_color = ColorF(
+        constrict_color_channel(new_color.red),
+        constrict_color_channel(new_color.green),
+        constrict_color_channel(new_color.blue),
+    )
+
+    return ColorF.from_hsl(
+        new_color.hue + base_color.hue,
+        (new_color.saturation + base_color.saturation) / 2,
+        base_color.lightness * (1.25 - new_color.lightness),
+    )

@@ -10,7 +10,11 @@
             "request": "launch",
             "program": "${workspaceFolder}/main.py",
             "console": "integratedTerminal",
-            "args": []
+            "args": [
+                "--mode=default",
+                "--json-dir=${workspaceFolder}/maseya/z3pr/data/",
+                "./test_rom.sfc"
+            ]
         }
     ]
 }

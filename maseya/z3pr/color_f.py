@@ -77,7 +77,7 @@ class ColorF:
 
     @property
     def saturation(self):
-        if self.lightness == 0 and self.lightness == 1:
+        if self.lightness == 0 or self.lightness == 1:
             return 0
         return clamp(self.chroma / (1 - abs((2 * self.lightness) - 1)), 0, 1)
 
@@ -168,9 +168,24 @@ class ColorF:
 
         return cls(match + red, match + green, match + blue)
 
+    @classmethod
+    def hue_blend(cls, left, right):
+        return cls.from_hcy(right.hue, left.chroma, left.luma)
+
+    @classmethod
+    def chroma_blend(cls, left, right):
+        return cls.from_hcy(left.hue, right.chroma, left.luma)
+
+    @classmethod
+    def luma_blend(cls, left, right):
+        return cls.from_hcy(left.hue, left.chroma, right.luma)
+
     @property
     def grayscale(self):
         return self.from_hcy(0, 0, self.luma)
+
+    def __hash__(self):
+        return hash((self.red, self.green, self.blue))
 
     def __str__(self) -> str:
         return f"{{R:{self.red};G:{self.green};B:{self.blue}}}"
