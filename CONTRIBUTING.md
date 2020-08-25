@@ -103,4 +103,4 @@ Try to comply to these rules as much as possible.
 [period]: https://chris.beams.io/posts/git-commit/#end
 [imperative]: https://chris.beams.io/posts/git-commit/#imperative
 [wrap]: https://chris.beams.io/posts/git-commit/#wrap-72
-[epxlain]: https://chris.beams.io/posts/git-commit/#why-not-how
+[explain]: https://chris.beams.io/posts/git-commit/#why-not-how
