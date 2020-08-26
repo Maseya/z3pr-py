@@ -57,7 +57,7 @@ def iterate_offsets_array_cache(
                 yield offsets
 
 
-def _random_color_generator(seed: int = -1) -> Iterable[ColorF]:
+def random_color_generator(seed: int = -1) -> Iterable[ColorF]:
     """Infinitely iterates random colors with an optional seed value."""
     random = Random(seed) if seed != -1 else Random()
 
@@ -81,7 +81,7 @@ def randomize(
 
     # Create standard random generator if no generator was given.
     if not color_generator:
-        color_generator = _random_color_generator()
+        color_generator = random_color_generator()
 
     # Create a palette editor for each offset collection.
     palette_editors = [PaletteEditor(rom, offsets) for offsets in offsets_iterator]
@@ -134,7 +134,7 @@ def randomize_from_options(options):
         output_path = append_to_file_name(input_path, "-rand-pal")
 
     # Define color-generating function.
-    next_color = _random_color_generator(options.pop("seed", -1))
+    next_color = random_color_generator(options.pop("seed", -1))
 
     # Read ROM data from file.
     with open(input_path, mode="rb") as stream:
