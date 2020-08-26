@@ -5,7 +5,12 @@ import os
 from typing import Iterable, List, Mapping, Tuple
 
 from maseya.z3pr.color_f import ColorF
-from maseya.z3pr.palette_randomizer import randomize
+from maseya.z3pr.palette_randomizer import (
+    randomize,
+    build_offsets_array,
+    cache_offsets_array,
+    iterate_offsets_array_cache,
+)
 from maseya.z3pr.math_helper import powerset
 
 # Minimum LTTP rom size is 2MB.
@@ -109,7 +114,8 @@ def test_no_randomize():
     for args in powerset(SUBSETS):
         options = _generate_options(args)
         rom = _initialize_test_rom(data, args)
-        randomize(rom, "None", None, options)
+        offsets_array = build_offsets_array(options)
+        randomize(rom, "None", offsets_array)
         _assert_changes_to_rom(rom, data, args)
 
 
@@ -122,7 +128,8 @@ def test_blackout():
     for args in powerset(SUBSETS):
         options = _generate_options(args)
         rom = _initialize_test_rom(data, args)
-        randomize(rom, "Blackout", None, options)
+        offsets_array = build_offsets_array(options)
+        randomize(rom, "Blackout", offsets_array)
         _assert_blackout_to_rom(rom, data, args)
 
 
@@ -136,7 +143,8 @@ def test_invert():
     for args in powerset(SUBSETS):
         options = _generate_options(args)
         rom = _initialize_test_rom(data, args)
-        randomize(rom, "Negative", None, options)
+        offsets_array = build_offsets_array(options)
+        randomize(rom, "Negative", offsets_array)
         _assert_changes_to_rom(rom, expected, args)
 
 
@@ -150,22 +158,23 @@ def test_grayscale():
     for args in powerset(SUBSETS):
         options = _generate_options(args)
         rom = _initialize_test_rom(data, args)
-        randomize(rom, "Grayscale", None, options)
+        offsets_array = build_offsets_array(options)
+        randomize(rom, "Grayscale", offsets_array)
         _assert_changes_to_rom(rom, expected, args)
 
 
 def _get_stored_random_colors(
     data: Mapping[str, Mapping[str, Mapping[str, List[int]]]], args: Iterable[str]
-):
+) -> List[ColorF]:
     """Get deterministically generated color values from JSON data."""
-    random_values = []
+    result = []
 
     # Get color values for all palette subsets we are using.
     for arg in args:
         # Get RGB colors from "random" key in JSON file.
         for array in data[arg]["random"]:
-            random_values.append(ColorF(*array))
-    return random_values
+            result.append(ColorF(*array))
+    return result
 
 
 def test_maseya_blend():
@@ -176,26 +185,53 @@ def test_maseya_blend():
     # Get the color data we'll be expecting from the final rom product.
     expected = _read_internal_json("maseya")
 
-    # Declare this array now so `next_color` can use it as nonlocal.
-    random_values = []
-
     # Run test for all palette subsets.
     for args in powerset(SUBSETS):
-        next_color_index = 0
+        # Get deterministic color generator for testing.
         random_values = _get_stored_random_colors(expected, args)
-
-        def next_color():
-            """Generate colors from our JSON test data."""
-            nonlocal next_color_index
-            nonlocal random_values
-            try:
-                result = random_values[next_color_index]
-            except:
-                assert False
-            next_color_index += 1
-            return result
 
         options = _generate_options(args)
         rom = _initialize_test_rom(data, args)
-        randomize(rom, "Default", next_color, options)
+        offsets_array = build_offsets_array(options)
+        randomize(rom, "Default", offsets_array, iter(random_values))
+        _assert_changes_to_rom(rom, expected, args)
+
+
+def test_cached_randomize_with_blackout():
+    """Assert blackout mode with cached offset array."""
+    # Cache JSON data into memory.
+    offsets_array_cache = cache_offsets_array()
+
+    # Get base palette data.
+    data = _read_internal_json("base")
+
+    # Run test for all palette subsets.
+    for args in powerset(SUBSETS):
+        options = _generate_options(args)
+        rom = _initialize_test_rom(data, args)
+        offsets_iterator = iterate_offsets_array_cache(offsets_array_cache, options)
+        randomize(rom, "Blackout", offsets_iterator)
+        _assert_blackout_to_rom(rom, data, args)
+
+
+def test_cached_randomize_with_maseya_blend():
+    """Assert maseya blend mode with cached offset array."""
+    # Cache JSON data into memory.
+    offsets_array_cache = cache_offsets_array()
+
+    # Get base palette data.
+    data = _read_internal_json("base")
+
+    # Get the color data we'll be expecting from the final rom product.
+    expected = _read_internal_json("maseya")
+
+    # Run test for all palette subsets.
+    for args in powerset(SUBSETS):
+        # Get deterministic color generator for testing.
+        random_values = _get_stored_random_colors(expected, args)
+
+        options = _generate_options(args)
+        rom = _initialize_test_rom(data, args)
+        offsets_iterator = iterate_offsets_array_cache(offsets_array_cache, options)
+        randomize(rom, "Maseya", offsets_iterator, iter(random_values))
         _assert_changes_to_rom(rom, expected, args)

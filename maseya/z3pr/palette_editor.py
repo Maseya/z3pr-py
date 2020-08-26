@@ -1,6 +1,6 @@
 """Define the PaletteEditor class."""
 
-from typing import Callable, List, Mapping
+from typing import Callable, Iterable, List, Mapping
 
 from .snes_color import SnesColor
 from .color_f import ColorF
@@ -30,11 +30,11 @@ class PaletteEditor:
     def blend(
         self,
         blend: Callable[[ColorF, ColorF], ColorF],
-        get_color: Callable[[], ColorF],
+        color_generator: Iterable[ColorF],
     ):
         """Blend palette data using blend function and color generator."""
         # Get base color from passed funcion.
-        base_color = get_color()
+        base_color = next(color_generator)
 
         # Blend each color in the palette editor.
         for offset in self.__items.keys():
@@ -53,10 +53,10 @@ class PaletteEditor:
     def blend_by_color(
         self,
         blend: Callable[[ColorF, ColorF], ColorF],
-        get_color: Callable[[], ColorF],
+        color_generator: Iterable[ColorF],
     ):
         for color, offsets in self.get_color_groups().items():
-            new_color = blend(color, get_color())
+            new_color = blend(color, next(color_generator))
             for offset in offsets:
                 self.__items[offset] = new_color
 
