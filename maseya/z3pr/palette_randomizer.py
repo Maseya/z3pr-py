@@ -4,7 +4,7 @@ import json
 import os
 from random import Random
 
-from typing import List
+from typing import List, Mapping
 
 from .color_f import ColorF
 from .palette_editor import PaletteEditor
@@ -23,7 +23,9 @@ def _read_internal_json(json_path: str, json_dir: str = None):
         return json.load(stream)
 
 
-def build_offsets_array(options: dict, json_dir: str = None):
+def build_offsets_array(
+    options: Mapping[str, bool], json_dir: str = None
+) -> List[List[int]]:
     """Build offset array from several offset arrays."""
 
     def try_get_offset_array(name: str) -> List[int]:

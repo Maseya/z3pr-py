@@ -1,6 +1,6 @@
 """Define the PaletteEditor class."""
 
-from typing import Callable, List
+from typing import Callable, List, Mapping
 
 from .snes_color import SnesColor
 from .color_f import ColorF
@@ -40,7 +40,7 @@ class PaletteEditor:
         for offset in self.__items.keys():
             self.__items[offset] = blend(self.__items[offset], base_color)
 
-    def get_color_groups(self):
+    def get_color_groups(self) -> Mapping[ColorF, List[int]]:
         result = dict()
         for offset, color in self.__items.items():
             colors = result.get(color, None)

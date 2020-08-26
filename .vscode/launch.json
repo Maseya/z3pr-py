@@ -12,7 +12,7 @@
             "console": "integratedTerminal",
             "args": [
                 "--mode=default",
-                "--json-dir=${workspaceFolder}/maseya/z3pr/data/",
+                "--data-dir=${workspaceFolder}/maseya/z3pr/data/",
                 "./test_rom.sfc"
             ]
         }

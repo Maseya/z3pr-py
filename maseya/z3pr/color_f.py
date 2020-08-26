@@ -28,43 +28,43 @@ class ColorF:
         return cls(1 - cyan, 1 - magenta, 1 - yellow)
 
     @property
-    def red(self):
+    def red(self) -> float:
         return self.__red
 
     @property
-    def green(self):
+    def green(self) -> float:
         return self.__green
 
     @property
-    def blue(self):
+    def blue(self) -> float:
         return self.__blue
 
     @property
-    def cyan(self):
+    def cyan(self) -> float:
         return 1 - self.__red
 
     @property
-    def magenta(self):
+    def magenta(self) -> float:
         return 1 - self.__green
 
     @property
-    def yellow(self):
+    def yellow(self) -> float:
         return 1 - self.__blue
 
     @property
-    def max_of_rgb(self):
+    def max_of_rgb(self) -> float:
         return max([self.__red, self.__green, self.__blue])
 
     @property
-    def min_of_rgb(self):
+    def min_of_rgb(self) -> float:
         return min([self.__red, self.__green, self.__blue])
 
     @property
-    def chroma(self):
+    def chroma(self) -> float:
         return self.max_of_rgb - self.min_of_rgb
 
     @property
-    def luma(self):
+    def luma(self) -> float:
         return (
             (LUMA_RED_WEIGHT * self.__red)
             + (LUMA_GREEN_WEIGHT * self.__green)
@@ -72,17 +72,17 @@ class ColorF:
         )
 
     @property
-    def lightness(self):
+    def lightness(self) -> float:
         return (self.max_of_rgb + self.min_of_rgb) / 2
 
     @property
-    def saturation(self):
+    def saturation(self) -> float:
         if self.lightness == 0 or self.lightness == 1:
             return 0
         return clamp(self.chroma / (1 - abs((2 * self.lightness) - 1)), 0, 1)
 
     @property
-    def hue(self):
+    def hue(self) -> float:
         # Technically, NaN should be returned, but returning 0 helps performance.
         if self.chroma == 0:
             return 0
@@ -101,10 +101,10 @@ class ColorF:
         return hue / 6.0
 
     @property
-    def hue_degrees(self):
+    def hue_degrees(self) -> float:
         return self.hue * 360
 
-    def __eq__(self, value):
+    def __eq__(self, value) -> bool:
         return (
             isinstance(value, ColorF)
             and self.__red == value.red
@@ -112,7 +112,7 @@ class ColorF:
             and self.__blue == value.blue
         )
 
-    def __ne__(self, value):
+    def __ne__(self, value) -> bool:
         return not self == value
 
     @property
@@ -184,11 +184,11 @@ class ColorF:
     def grayscale(self):
         return self.from_hcy(0, 0, self.luma)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.red, self.green, self.blue))
 
     def __str__(self) -> str:
         return f"{{R:{self.red};G:{self.green};B:{self.blue}}}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)

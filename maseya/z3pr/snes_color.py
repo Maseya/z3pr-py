@@ -122,16 +122,16 @@ class SnesColor:
             convert_channel(self.blue),
         )
 
-    def __eq__(self, value):
+    def __eq__(self, value) -> bool:
         return isinstance(value, SnesColor) and value.value == self.__value
 
-    def __ne__(self, value):
+    def __ne__(self, value) -> bool:
         return not self == value
 
     def __str__(self) -> str:
         return f"{{R:{self.red};G:{self.green};B:{self.blue}}}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self)
 
     def __hash__(self) -> int:
