@@ -4,7 +4,8 @@ import json
 import os
 from random import Random
 
-from typing import List, Mapping
+from itertools import cycle
+from typing import Iterable, List, Mapping
 
 from .color_f import ColorF
 from .palette_editor import PaletteEditor
@@ -33,29 +34,42 @@ def build_offsets_array(
             return _read_internal_json(f"{name}.json", json_dir)
         return []
 
-    offsets = []
+    result = []
     # TODO(bonimy): Add the other palette data like sprites.
     for name in ["dungeon", "hud", "link_sprite", "sword", "shield", "overworld"]:
-        offsets.extend(try_get_offset_array(name))
-    return offsets
+        result.extend(try_get_offset_array(name))
+    return result
 
 
-def _random_color_generator(seed: int = -1):
-    """Generate random colors with an optional seed value."""
+def cache_offsets_array(json_dir: str = None) -> Mapping[str, List[List[int]]]:
+    result = dict()
+    for name in ["dungeon", "hud", "link_sprite", "sword", "shield", "overworld"]:
+        result[f"randomize_{name}"] = _read_internal_json(f"{name}.json", json_dir)
+    return result
+
+
+def iterate_offsets_array_cache(
+    offsets_array: Mapping[str, List[List[int]]], options: Mapping[str, bool]
+) -> Iterable[List[int]]:
+    for name, is_set in options.items():
+        if is_set:
+            for offsets in offsets_array.get(name, []):
+                yield offsets
+
+
+def random_color_generator(seed: int = -1) -> Iterable[ColorF]:
+    """Infinitely iterates random colors with an optional seed value."""
     random = Random(seed) if seed != -1 else Random()
 
-    def next_color():
-        return ColorF(random.random(), random.random(), random.random())
-
-    return next_color
+    while True:
+        yield ColorF(random.random(), random.random(), random.random())
 
 
 def randomize(
     rom: bytearray,
     mode: str,
-    next_color=None,
-    options: dict = None,
-    json_dir: str = None,
+    offsets_iterator: Iterable[List[int]],
+    color_generator: Iterable[ColorF] = None,
 ):
     """Randomize palette data in a rom."""
     # We want to do case-invariant searches
@@ -66,30 +80,26 @@ def randomize(
         return
 
     # Create standard random generator if no generator was given.
-    if not next_color:
-        next_color = _random_color_generator()
-
-    # Get array of offset collections. Each offset collection specifies a grouping
-    # palette data that should be blended by the same rules.
-    offsets_array = build_offsets_array(options, json_dir)
+    if not color_generator:
+        color_generator = random_color_generator()
 
     # Create a palette editor for each offset collection.
-    palette_editors = [PaletteEditor(rom, offsets) for offsets in offsets_array]
+    palette_editors = [PaletteEditor(rom, offsets) for offsets in offsets_iterator]
 
     # Get the basic algorithms and offer some variant spellings just in case.
     algorithm_tuples = {
-        "maseya": [maseya_blend, next_color, PaletteEditor.blend],
-        "grayscale": [lambda x, y: x.grayscale, lambda: None, PaletteEditor.blend],
-        "negative": [lambda x, y: x.inverse, lambda: None, PaletteEditor.blend],
-        "blackout": [lambda x, y: y, lambda: ColorF(0, 0, 0), PaletteEditor.blend],
-        "classic": [acid_blend, next_color, PaletteEditor.blend],
-        "dizzy": [ColorF.hue_blend, next_color, PaletteEditor.blend_by_color,],
+        "maseya": [maseya_blend, color_generator, PaletteEditor.blend],
+        "grayscale": [lambda x, y: x.grayscale, cycle([None]), PaletteEditor.blend],
+        "negative": [lambda x, y: x.inverse, cycle([None]), PaletteEditor.blend],
+        "blackout": [lambda x, y: y, cycle([ColorF(0, 0, 0)]), PaletteEditor.blend],
+        "classic": [acid_blend, color_generator, PaletteEditor.blend],
+        "dizzy": [ColorF.hue_blend, color_generator, PaletteEditor.blend_by_color,],
         "sick": [
             lambda x, y: ColorF.luma_blend(y, x),
-            next_color,
+            color_generator,
             PaletteEditor.blend_by_color,
         ],
-        "puke": [lambda x, y: y, next_color, PaletteEditor.blend_by_color],
+        "puke": [lambda x, y: y, color_generator, PaletteEditor.blend_by_color],
     }
     algorithm_tuples["default"] = algorithm_tuples["maseya"]
     algorithm_tuples["greyscale"] = algorithm_tuples["grayscale"]
@@ -98,11 +108,11 @@ def randomize(
     algorithm_tuples["inverted"] = algorithm_tuples["negative"]
 
     # Now see which algorithm tuple we actually want.
-    color_blend, get_next_color, palette_blend = algorithm_tuples[mode]
+    color_blend, color_generator, palette_blend = algorithm_tuples[mode]
 
     # Blend colors in each palette editor then write it back to rom.
     for palette_editor in palette_editors:
-        palette_blend(palette_editor, color_blend, get_next_color)
+        palette_blend(palette_editor, color_blend, color_generator)
         palette_editor.write_to_rom(rom)
 
 
@@ -124,14 +134,18 @@ def randomize_from_options(options):
         output_path = append_to_file_name(input_path, "-rand-pal")
 
     # Define color-generating function.
-    next_color = _random_color_generator(options.pop("seed", -1))
+    next_color = random_color_generator(options.pop("seed", -1))
 
     # Read ROM data from file.
     with open(input_path, mode="rb") as stream:
         rom = bytearray(stream.read())
 
+    # Get array of offset collections. Each offset collection specifies a grouping
+    # palette data that should be blended by the same rules.
+    offsets_array = build_offsets_array(options, json_dir)
+
     # Randomize ROM data.
-    randomize(rom, options.pop("mode", "default"), next_color, options, json_dir)
+    randomize(rom, options.pop("mode", "default"), next_color, offsets_array)
 
     # Write results to output file.
     with open(output_path, mode="wb") as stream:
