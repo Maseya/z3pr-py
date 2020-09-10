@@ -39,9 +39,11 @@ def maseya_blend(color: ColorF, changes: ColorF) -> ColorF:
     return ColorF.from_hcy(hue, chroma, luma)
 
 
-def acid_blend(base_color: ColorF, new_color: ColorF) -> ColorF:
-    """Change a color value but allow it to occassionally look ugly."""
+def classic_blend(base_color: ColorF, new_color: ColorF) -> ColorF:
+    """Loosely emulate original palette randomizer."""
 
+    # I may need to change the range to [30, 240] to emulate the
+    # occassional very-dark dungeon palettes.
     def constrict_color_channel(value: float):
         return (value * (240.0 - 60.0) / 255.0) + (60.0 / 255.0)
 

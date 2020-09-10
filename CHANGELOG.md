@@ -22,7 +22,7 @@
   `ColorF` class, which replaces one HCY component of one color with
   another.
 * Add `ColorF.__hash__` function.
-* Add `acid_blend` function, which attempts to mimic the original
+* Add `classic_blend` function, which attempts to mimic the original
   palette shuffle code. Some people have referred to the original
   output as "acid colors", hence the name.
 

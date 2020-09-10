@@ -43,11 +43,11 @@ class PaletteEditor:
     def get_color_groups(self) -> Mapping[ColorF, List[int]]:
         result = dict()
         for offset, color in self.__items.items():
-            colors = result.get(color, None)
-            if not colors:
+            offsets = result.get(color, None)
+            if not offsets:
                 result[color] = [offset]
             else:
-                colors.append(offset)
+                offsets.append(offset)
         return result
 
     def blend_by_color(

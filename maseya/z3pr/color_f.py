@@ -15,7 +15,7 @@ LUMA_GREEN_WEIGHT = 0.587
 LUMA_BLUE_WEIGHT = 0.114
 
 
-class ColorF:
+class ColorF:  # pylint: disable=too-many-public-methods
     """An RGB color where each RGB component is between [0, 1]."""
 
     def __init__(self, red: float, green: float, blue: float):
