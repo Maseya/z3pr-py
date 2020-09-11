@@ -61,7 +61,7 @@ Go to our [Releases](https://github.com/Maseya/z3pr-py/releases)
 page. From there, download _z3pr.zip_ under the _Assets_ tab of
 the latest release.
 
-Or you can install it through pip with `pip install --user maseya.z3pr`
+Or you can install it through pip with `pip install --user maseya-z3pr`
 
 It is recommended that your logic randomizer app keep the vanilla palette, or
 you may still experience ugly colors after using this app.
