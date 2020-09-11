@@ -1,6 +1,14 @@
 # Changelog
 
-## v1.0.0-dev6 Add new blend modes
+## v1.0.0.rc1
+
+* Add tests for new blend modes.
+* Correct some typos in comments.
+* Clarify docstrings.
+* Use consistent naming for objects describing offset collections.
+* Update helpfuness README.
+
+## v1.0.0.dev6 Add new blend modes
 
 * Update missing/wrong information in README and correct some typos.
 * Add `--data-dir` compiler flag to specify custom directory to JSON
@@ -26,11 +34,11 @@
   palette shuffle code. Some people have referred to the original
   output as "acid colors", hence the name.
 
-## v1.0.0-dev5
+## v1.0.0.dev5
 
 * Release testable dev release.
 
-## v1.0.0-dev1
+## v1.0.0.dev1
 
 * Create test dev release.
 

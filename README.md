@@ -39,11 +39,11 @@ A set of colors is randomized according to the following rules:
 
 ## Advantages over other palette randomizers
 
-While Link to the Past Randomizer already has a built-in palette randomizer, it does
-not take the necessary care to ensure every palette can be randomized. Certain items
-like houses and rocks are never randomized. Further, the overworld palette randomizer
-does not have as much control as this app does, which allows for much richer
-variety of colors.
+While [Link to the Past Randomizer](https://alttpr.com) already has a built-in
+palette randomizer, it does not take the necessary care to ensure every palette
+can be randomized. Certain items like houses and rocks are never randomized.
+Further, the overworld palette randomizer does not have as much control as this
+app does, which allows for much richer variety of colors.
 
 TODO: Add pictures
 
