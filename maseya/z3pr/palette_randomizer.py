@@ -140,7 +140,7 @@ def randomize_from_options(options):
     offset_collections = build_offset_collections(options, json_dir)
 
     # Randomize ROM data.
-    randomize(rom, options.pop("mode", "default"), random_colors, offset_collections)
+    randomize(rom, options.pop("mode", "default"), offset_collections, random_colors)
 
     # Write results to output file.
     with open(output_path, mode="wb") as stream:
